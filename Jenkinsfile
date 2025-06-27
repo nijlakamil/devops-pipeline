@@ -1,6 +1,13 @@
 pipeline {
   agent any
 
+  environment {
+    ARM_CLIENT_ID       = credentials('ARM_CLIENT_ID')
+    ARM_CLIENT_SECRET   = credentials('ARM_CLIENT_SECRET')
+    ARM_SUBSCRIPTION_ID = credentials('ARM_SUBSCRIPTION_ID')
+    ARM_TENANT_ID       = credentials('ARM_TENANT_ID')
+  }
+
   stages {
     stage('Terraform Init') {
       steps {
@@ -9,6 +16,7 @@ pipeline {
         }
       }
     }
+
     stage('Terraform Apply') {
       steps {
         dir('terraform') {
@@ -16,6 +24,7 @@ pipeline {
         }
       }
     }
+
     stage('Ansible Run') {
       steps {
         sshagent (credentials: ['ansible-key']) {
@@ -23,6 +32,7 @@ pipeline {
         }
       }
     }
+
     stage('Verify Website') {
       steps {
         sh 'curl http://74.235.176.10'
