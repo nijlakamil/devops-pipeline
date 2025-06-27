@@ -28,7 +28,13 @@ pipeline {
     stage('Ansible Run') {
       steps {
         sshagent (credentials: ['ansible-key']) {
-          sh 'ansible-playbook -i inventory.ini ansible/install_web.yml'
+          sh '''
+            # Add public IP to known_hosts to avoid verification failure
+            ssh-keyscan -H 74.235.176.10 >> ~/.ssh/known_hosts
+
+            # Run Ansible playbook
+            ansible-playbook -i inventory.ini ansible/install_web.yml
+          '''
         }
       }
     }
